@@ -2,6 +2,7 @@ package com.example.vp.farkle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     ImageButton[] buttons = new ImageButton[6];
     int[] buttonState = new int[6];
+    int[] dieImages = new int[6];
+    int[] dieValue = new int[6];
     final int HOT_DIE = 0;
     final int SCORE_DIE = 1;
     final int LOCKED_DIE = 2;
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for(int a = 0; a < buttons.length; a++){
             buttons[a].setOnClickListener(this);
             buttons[a].setEnabled(false);
+            buttons[a].setBackgroundColor(Color.LTGRAY);
         }
         roll = (Button)this.findViewById(R.id.button1);
         roll.setOnClickListener(this);
@@ -48,10 +52,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentScoreTV = (TextView)this.findViewById(R.id.textView1);
         totalScoreTV = (TextView)this.findViewById(R.id.textView2);
         currentRoundTV = (TextView)this.findViewById(R.id.textView3);
+        dieImages[0] = R.drawable.one;
+        dieImages[1] = R.drawable.two;
+        dieImages[2] = R.drawable.three;
+        dieImages[3] = R.drawable.four;
+        dieImages[4] = R.drawable.five;
+        dieImages[5] = R.drawable.six;
+
+
+
+
     }
 
     @Override
     public void onClick(View v) {
+        if(v.equals(roll)){
+            for (int i = 0; i < buttons.length; i++){
+                if(buttonState[i] == HOT_DIE){
+                    int choice = (int)(Math.random() * 6);
+                    dieValue[i] = choice;
+                    buttons[i].setImageResource(dieImages[choice]);
+                    buttons[i].setEnabled(true);
+                    roll.setEnabled(false);
+                    score.setEnabled(true);
+                }
+            }
+        }else if(v.equals(score)){
+            int[] valueCount = new int[7];
 
+
+        }else if(v.equals(stop)){
+
+        }else{
+            for (int i = 0; i < buttons.length; i++) {
+                if(v.equals(buttons[i])){
+                    if(buttonState[i] == HOT_DIE){
+                        buttons[i].setBackgroundColor(Color.RED);
+                        buttonState[i] = SCORE_DIE;
+                    }else{
+                        buttons[i].setBackgroundColor(Color.LTGRAY);
+                        buttonState[i] = HOT_DIE;
+                    }
+                }
+            }
+        }
     }
 }
