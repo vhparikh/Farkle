@@ -2,6 +2,8 @@ package com.example.vp.farkle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView currentScoreTV;
     TextView totalScoreTV;
     TextView currentRoundTV;
+    int currentScore;
+    int totalScore;
+    int currentRound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +80,123 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buttons[i].setEnabled(true);
                     roll.setEnabled(false);
                     score.setEnabled(true);
+                    stop.setEnabled(false);
                 }
             }
         }else if(v.equals(score)){
             int[] valueCount = new int[7];
+            for (int a = 0; a < buttonState.length; a++) {
+                if(buttonState[a] == SCORE_DIE){
+                    valueCount[dieValue[a] + 1]++;
+                }
+            }
+            if((valueCount[2] > 0 && valueCount[2] < 3) ||
+                    (valueCount[3] > 0 && valueCount[3] < 3) ||
+            (valueCount[4] > 0 && valueCount[4] < 3) ||
+            (valueCount[6] > 0 && valueCount[6] < 3)){
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("Invalid Die Selected");
+                alertDialogBuilder
+                        .setMessage("You can only select scoring dice.")
+                        .setCancelable(false)
+                        .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }else if (valueCount[1] == 0 && valueCount[2] == 0 &&
+                    valueCount[3] == 0 && valueCount[4] == 0 &&
+                    valueCount[5] == 0 && valueCount[6] == 0){
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("No score!");
+                alertDialogBuilder
+                        .setMessage("Forfeit score and go to next round?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                currentRound = 0;
+                                currentRound++;
+                                currentScoreTV.setText("Current Score: " + currentScore);
+                                currentRoundTV.setText("Current Round: " + currentRound);
+                                resetDice();
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
 
+            }else{
+                if(valueCount[1] < 3){
+                    currentScore += (valueCount[1] * 100);
+                }
+                if (valueCount[5] < 3){
+                    currentScore += (valueCount[5] * 50);
+                }
+                if (valueCount[1] >= 3){
+                    currentScore += ((valueCount[1] - 2) * 1000);
+                }
+                if (valueCount[2] >= 3){
+                    currentScore += ((valueCount[2] - 2) * 200);
+                }
+                if (valueCount[3] >= 3){
+                    currentScore += ((valueCount[3] - 2) * 300);
+                }
+                if (valueCount[4] >= 3){
+                    currentScore += ((valueCount[4] - 2) * 400);
+                }
+                if (valueCount[5] >= 3){
+                    currentScore += ((valueCount[5] - 2) * 500);
+                }
+                if (valueCount[6] >= 3){
+                    currentScore += ((valueCount[6] - 2) * 600);
+                }
+                currentScoreTV.setText("Current Score: " + currentScore);
+                for (int a = 0; a < buttons.length; a++) {
+                    if(buttonState[a] ==  SCORE_DIE){
+                        buttonState[a] = LOCKED_DIE;
+                        buttons[a].setBackgroundColor(Color.BLUE);
+                        buttons[a].setEnabled(false);
+                    }
+                }
+                int lockedCount = 0;
+                for (int i = 0; i < buttons.length ; i++) {
+                    if(buttonState[i] == LOCKED_DIE){
+                        lockedCount++;
+                    }
+                }
+                if(lockedCount == 6){
+                    for (int i = 0; i < buttons.length ; i++) {
+                        buttonState[i] = HOT_DIE;
+                        buttons[i].setBackgroundColor(Color.LTGRAY);
+                    }
+                }
+
+                for (int a = 0; a < buttons.length; a++) {
+                    if(buttonState[a] == HOT_DIE){
+                        buttons[a].setEnabled(false);
+                    }
+                }
+                roll.setEnabled(true);
+                score.setEnabled(false);
+                stop.setEnabled(true);
+
+            }
 
         }else if(v.equals(stop)){
+            totalScore += currentScore;
+            currentScore = 0;
+            totalScoreTV.setText("Total Score: " + totalScore);
+            currentScoreTV.setText("Current Score: " + currentScore);
+            currentRound++;
+            currentRoundTV.setText("Current Round: " + currentRound);
+            resetDice();
 
         }else{
             for (int i = 0; i < buttons.length; i++) {
@@ -96,5 +211,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
+    }
+
+    private void resetDice() {
+        for (int a = 0; a < buttons.length; a++) {
+            buttons[a].setEnabled(false);
+            buttonState[a] = HOT_DIE;
+            buttons[a].setBackgroundColor(Color.LTGRAY);
+        }
+        roll.setEnabled(true);
+        score.setEnabled(false);
+        stop.setEnabled(false);
     }
 }
