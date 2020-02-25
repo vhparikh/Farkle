@@ -1,3 +1,9 @@
+/*
+    Create by: Vatsal Parikh
+    Date: 2/25/2020
+    Dice game inspired by Mr. Galbraith's video tutorials
+ */
+
 package com.example.vp.farkle;
 
 import androidx.appcompat.app.AppCompatActivity;
