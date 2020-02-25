@@ -116,10 +116,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setCancelable(false)
                         .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-                                currentRound = 0;
+                                totalScore += currentScore;
+                                currentScore= 0;
                                 currentRound++;
                                 currentScoreTV.setText("Current Score: " + currentScore);
                                 currentRoundTV.setText("Current Round: " + currentRound);
+                                totalScoreTV.setText("Total Score: " + totalScore);
                                 resetDice();
                                 dialog.dismiss();
                             }
